@@ -2,24 +2,23 @@
 
 void reverse(int arr[], int n) {
     int * first = arr;
-    int * last = arr + n;
-    for (int * i = first; i < last - n/2; i++) {
-        int tmp = last-i;
-        arr[tmp-1] = *i;
-        arr[*i-1] = tmp;
-    
-        printf("[i] %d  ", i);
-        printf("[*i] %d  ", *i);
-        printf("[&i] %d  ", &i);
-        printf("[tmp] %d    ", tmp);
-        printf("arr[tmp] %d\n", arr[tmp-1]);
+    int * last = arr + n; 
+    int * until = arr + n / 2;
+
+    for (int * i = first; i <= until; i++) {
+        int mirror = last - i;
+        arr[mirror-1] = *i;
+        *i = mirror;
     }
+    
 }
 
 int main() {
-    int arr[8] = {1, 2, 3, 4, 5, 6, 7, 8};
-    reverse(arr, 8);
-    for (int i = 0; i < 6; i++) 
+    int arr[] = {1, 2, 3, 4, 5, 6, 7};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    reverse(arr, n);
+
+    for (int i = 0; i < n; i++) 
         printf("%d ", arr[i]);
     printf("\n");
     return 0;
