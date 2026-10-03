@@ -18,16 +18,20 @@ int rle_encode(const char *src, char *dest, int dest_size) {
     size_t len = strlen(src); 
     if (len == 0) {return 0;}
 
-    char * destloc = dest;
+    int written = 0;
     for (int i = 0; i < len;) {
         int runlen = run_chk(src, &src[i], len); 
         char run[10]; 
-        sprintf(run, "%c%d", src[i], runlen);
-        strcat(dest, run);
+        int added = snprintf(
+            dest + written, 
+            dest_size - written + 1, 
+            "%c%d", src[i], runlen);
+
         i += runlen;
+        written += added;
     }
     //int outsize = sizeof(d)/sizeof(d[0]);
-    if (strlen(dest) == dest_size) {
+    if ( written == dest_size) {
         return strlen(dest);
     } else {
         return -1;
@@ -74,7 +78,7 @@ int main(){
         int sizeofdest = sizeof(dest);
         int ret = rle_encode(src[i], dest, sizeof(dest));
 
-        printf("%d: %s\n", i, src[i]);
+        printf("%d: %s\n", i+1, src[i]);
         printf("\tOUTPUT: %s (%d)\n\n", dest, ret);
     }
 }
