@@ -15,27 +15,25 @@ int run_chk(const char *src, char *idx, int len){
 }
 
 int rle_encode(const char *src, char *dest, int dest_size) {
-    size_t len_src = strlen(src); 
-    char *last = src + len_src;
-    char outstr[dest_size];
-    
-    int idest = 0;
-    for (int i = 0; i < len_src;) {
-        int run = run_chk(src, &src[i], len_src); 
-        outstr[idest] = src[i];
-        outstr[idest+1] = (char)run;
-        idest += 2; 
-        i += run;
+    size_t len = strlen(src); 
+    if (len == 0) {return 0;}
+
+    char * destloc = dest;
+    for (int i = 0; i < len;) {
+        int runlen = run_chk(src, &src[i], len); 
+        char run[10]; 
+        sprintf(run, "%c%d", src[i], runlen);
+        strcat(dest, run);
+        i += runlen;
     }
-    int outsize = sizeof(outstr)/sizeof(outstr[0]);
-    if (outsize == dest_size) {
-        dest = outstr;
-        return outsize;
+    //int outsize = sizeof(d)/sizeof(d[0]);
+    if (strlen(dest) == dest_size) {
+        return strlen(dest);
     } else {
         return -1;
     }
 }
-
+/*
 int test(){
     const char src[5][18] = {
         "aaabbc",
@@ -60,9 +58,23 @@ int test(){
         } 
     } 
 }
-
+*/
 int main(){
-    const char src[6] = "aaabbc";
-    char dest[6];
-    
+    const char src[5][20] = {
+        "aaabbc",
+        "",
+        "a",
+        "wwwwwwwwwwwwbbbwww",
+        "aaabbc"
+    };
+    int targetsz[5] = {6,0,2,7,-1};
+
+    for (int i = 0; i < 5; i++) {
+        char dest[targetsz[i]];
+        int sizeofdest = sizeof(dest);
+        int ret = rle_encode(src[i], dest, sizeof(dest));
+
+        printf("%d: %s\n", i, src[i]);
+        printf("\tOUTPUT: %s (%d)\n\n", dest, ret);
+    }
 }
