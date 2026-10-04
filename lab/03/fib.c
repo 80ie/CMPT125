@@ -2,12 +2,9 @@
 #include <stdlib.h>
 
 
-int fib(int n) { 
+int fib(unsigned int n) { 
     if (n < 2) { return n; }
-    int Fn = fib(n - 1) + fib(n - 2);
-    return Fn;
-
-
+    return fib(n - 1) + fib(n - 2);
 }
 
 
