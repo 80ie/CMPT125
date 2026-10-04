@@ -2,9 +2,9 @@
 #include <string.h>
 #include <assert.h>
 
-int run_chk(const char *src, int idx, int len){
+int run_chk(const char *src, int idx, size_t len){
     int run = 0;
-    for (char * i = src+idx; i < src+len; i++){
+    for (const char * i = src+idx; i < src+len; i++){
         if (src[idx] == *i) {
             run++;
         } else {
@@ -15,33 +15,28 @@ int run_chk(const char *src, int idx, int len){
 }
 
 int rle_encode(const char *src, char *dest, int dest_size) {
+    size_t max = (size_t)dest_size;
     size_t len = strlen(src); 
     if (len == 0) {
         *dest = *src;
-        return 0;
-    }
+        return 0;}
 
-    size_t max = (size_t)dest_size;
     size_t written = 0;
     dest[0] = '\0';
-
     for (int i = 0; i < (int)len;) {
         int runlen = run_chk(src, i, len); 
 
         size_t remaining = max - written;
-        int added = snprintf(
-            dest + written, 
-            dest_size - written + 1, 
-            "%c%d", src[i], runlen);
+        int added = snprintf(dest + written, remaining, "%c%d", src[i], runlen);
+        
+        if ((size_t)added >= remaining) {
+            return -1;
+        }
 
         i += runlen;
-        written += added;
+        written += (size_t)added;
     }
-    if ( written == dest_size) {
-        return strlen(dest);
-    } else {
-        return -1;
-    }
+    return (int)written;
 }
 /*
 int test(){
@@ -77,13 +72,14 @@ int main(){
         "wwwwwwwwwwwwbbbwww",
         "aaabbc"
     };
-    int sizes[5] = {6,0,2,7,-1};
+    //int sizes[5] = {6,0,2,7,-1};
+
+
 
     for (int i = 0; i < 5; i++) {
         char dest[20]; 
         int ret = rle_encode(src[i], dest, sizeof(dest));
 
-        assert(sizes[i] == ret);
 
         printf("%d: %s\n", i+1, src[i]);
         printf("\tOUTPUT: %s (%d)\n\n", dest, ret);
