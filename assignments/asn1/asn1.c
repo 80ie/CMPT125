@@ -1,87 +1,53 @@
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 
 int run_chk(const char *src, int idx, size_t len){
     int run = 0;
     for (const char * i = src+idx; i < src+len; i++){
         if (src[idx] == *i) {
             run++;
-        } else {
-            return run;
-        }
+        } else { return run; }
     }
     return run;
 }
 
 int rle_encode(const char *src, char *dest, int dest_size) {
+    // size_t to ensure unsigned lengths etc
     size_t max = (size_t)dest_size;
     size_t len = strlen(src); 
+
+    // precondition: len > 0
     if (len == 0) {
         *dest = *src;
-        return 0;}
+        return 0; }
 
     size_t written = 0;
     dest[0] = '\0';
     for (int i = 0; i < (int)len;) {
+        size_t remaining = max - written;
         int runlen = run_chk(src, i, len); 
 
-        size_t remaining = max - written;
         int added = snprintf(dest + written, remaining, "%c%d", src[i], runlen);
-        
+
+        // clear dest if hit limit
         if ((size_t)added >= remaining) {
-            return -1;
-        }
+            dest[0] = '\0';
+            return -1;}        
 
         i += runlen;
         written += (size_t)added;
     }
     return (int)written;
 }
-/*
-int test(){
-    const char src[5][18] = {
-        "aaabbc",
-        "",
-        "a",
-        "wwwwwwwwwwwwbbbwww",
-        "aaabbc"
-    };
-    const char expected[4][7] = {
-        "a3b2c1","","a1","w12b3w3"
-    };
-    //char *dest[5] = {};
-    int size[5] = {6,0,2,7,-1};
 
-    for (int i = 0; i < 5; i++) {
-        printf("%d: %s\n", i, src[i]);
-        char d[size[i]];
-        int ret = rle_encode(src[i], &d, size[i]);
-        printf("\tOUTPUT: %s (%d)\n\n", *d, ret);
-        if (ret != -1) {
-            //assert(strcmp(expected[i],dest[i]) == 0);
-        } 
-    } 
-}
-*/
 int main(){
-    const char src[5][20] = {
-        "aaabbc",
-        "",
-        "a",
-        "wwwwwwwwwwwwbbbwww",
-        "aaabbc"
-    };
-    //int sizes[5] = {6,0,2,7,-1};
+    const char src[5][20] = {"aaabbc","","a","wwwwwwwwwwwwbbbwww","aaabbc"};
+    int dest_size[5] = {7,5,3,8,5};
 
-
-
+    printf("%-20s %-20s %s\n", "src", "compressed", "retcode");
     for (int i = 0; i < 5; i++) {
         char dest[20]; 
-        int ret = rle_encode(src[i], dest, sizeof(dest));
-
-
-        printf("%d: %s\n", i+1, src[i]);
-        printf("\tOUTPUT: %s (%d)\n\n", dest, ret);
+        int ret = rle_encode(src[i], dest, dest_size[i]);
+        printf("%-20s %-20s %d\n", src[i], dest, ret);
     }
 }
