@@ -1,0 +1,31 @@
+
+find_saddles( A[n][n] ) {
+
+	maximums = [];
+	minimums = [];
+  saddles = []
+
+  for x in A:
+    col = [y for y in A[x][y]];
+		// scan through each row and return y-coord of min/max 
+    min, max = min(col), max(col);
+    
+    maximums[x] = max;
+    minimums[x] = min;
+
+  for y in A: 
+    row = [x for x in A[x][y]];
+
+    for max, min in maximums, minimums:
+
+      if max.y == y:
+        if min(row) == max
+          saddles.append(max)
+
+      if min.y == y: 
+        if max(row) == max:
+          saddles.append(max)  
+
+  return saddles;
+}
+
